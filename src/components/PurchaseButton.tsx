@@ -33,29 +33,29 @@ export default function PurchaseButton(
       const data = (await res.json().catch(() => null)) as
         | null
         | {
-            message?: string;
-            order?: {
-              id?: string;
-              total_amount?: number;
-              payment_status?: string;
-              created?: string;
-              order_details?: Array<{
-                product_name?: string;
-                product_image?: string;
-                amount?: number;
-                price?: number;
-                product?: string | number;
-                variation_product?: string | number | null;
-              }>;
-            };
+          message?: string;
+          order?: {
+            id?: string;
+            total_amount?: number;
+            payment_status?: string;
+            created?: string;
             order_details?: Array<{
               product_name?: string;
               product_image?: string;
               amount?: number;
               price?: number;
+              product?: string | number;
+              variation_product?: string | number | null;
             }>;
-            error?: string;
           };
+          order_details?: Array<{
+            product_name?: string;
+            product_image?: string;
+            amount?: number;
+            price?: number;
+          }>;
+          error?: string;
+        };
       if (!res.ok || !data?.order?.id) {
         setError(data?.error ?? "Purchase failed");
         return;
@@ -66,16 +66,16 @@ export default function PurchaseButton(
 
       const detail = data.order.order_details?.[0] ?? data.order_details?.[0];
       setPurchase({
-        orderId: data.order.id,
+        orderId: data.order?.id ?? "",
         productId,
-        status: data.order.payment_status,
-        amount: typeof detail?.amount === "number" ? detail.amount : data.order.total_amount,
+        status: data.order?.payment_status ?? "",
+        amount: typeof detail?.amount === "number" ? detail.amount : data.order?.total_amount ?? 0,
         productName: detail?.product_name,
         productImage: detail?.product_image,
-        createdAt: data.order.created,
+        createdAt: data.order?.created ?? "",
       });
 
-      router.push(`/order-success/${encodeURIComponent(data.order.id)}`);
+      router.push(`/order-success/${encodeURIComponent(data?.order?.id ?? "")}`);
     } catch {
       setError("Purchase failed");
     } finally {
@@ -88,16 +88,16 @@ export default function PurchaseButton(
       <button
         type="button"
         className={
-          props.variant === "dark"
+          props?.variant === "dark"
             ? "h-10 rounded-xl border border-white/15 bg-white/10 px-4 text-sm font-medium text-white backdrop-blur disabled:opacity-60 hover:bg-white/15"
-            : props.variant === "white"
+            : props?.variant === "white"
               ? "h-11 rounded-xl bg-white px-6 text-sm font-semibold text-black disabled:opacity-60 hover:bg-white/90"
               : "h-10 rounded-xl bg-black px-4 text-sm font-medium text-white disabled:opacity-60 dark:bg-white dark:text-black"
         }
         onClick={purchase}
         disabled={loading}
       >
-        {loading ? "Buying..." : (props.label ?? "Buy")}
+        {loading ? "Buying..." : (props?.label ?? "Buy")}
       </button>
       {error ? <p className="text-sm text-red-600 dark:text-red-400">{error}</p> : null}
     </div>

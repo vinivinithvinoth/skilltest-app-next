@@ -63,39 +63,35 @@ const OrderSuccessByIdPage = () => {
                                     className="h-full w-full object-contain p-1"
                                 />
                             ) : (
-                                <img
-                                    src="/logo_sm.svg"
-                                    alt=""
-                                    className="w-10 h-10 object-contain opacity-80"
-                                />
+                                <span className="truncate text-sm font-semibold">{name}</span>
                             )}
                         </div>
 
                         <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold">{name}</p>
+                            <span className="truncate text-sm font-semibold">{name}</span>
 
-                            <p className="mt-0.5 truncate text-[11px] text-white/55">
+                            <span className="mt-0.5 truncate text-[11px] text-white/55">
                                 {displayOrderId ? `Order ${displayOrderId}` : "Order confirmed"}
-                            </p>
+                            </span>
 
 
-                            <p className="mt-0.5 text-[11px] text-white/45">
+                            <span className="mt-0.5 text-[11px] text-white/45">
                                 Status: <span className="text-green-400/90">{status}</span>
-                            </p>
+                            </span>
 
                         </div>
 
                         <div className="shrink-0 text-right">
                             {total !== undefined && (
-                                <p className="text-sm font-semibold text-white">
+                                <span className="text-sm font-semibold text-white">
                                     {formatINR(total)}
-                                </p>
+                                </span>
                             )}
 
                             {mrp !== undefined && (
-                                <p className="mt-0.5 text-[11px] text-white/40 line-through">
+                                <span className="mt-0.5 text-[11px] text-white/40 line-through">
                                     {formatINR(mrp).replace(/\.00$/, "")}
-                                </p>
+                                </span>
                             )}
                         </div>
                     </div>
@@ -103,7 +99,7 @@ const OrderSuccessByIdPage = () => {
 
                 {!data && (
                     <div className="mt-6 text-sm text-white/60">
-                        <p>No recent purchase found in this browser.</p>
+                        <span>No recent purchase found in this browser.</span>
                     </div>
                 )}
             </div>

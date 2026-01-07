@@ -7,17 +7,16 @@ import { User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
-export default function HeaderAuthNav({
+const HeaderAuthNav = ({
     isAuthed,
 }: {
     isAuthed: boolean;
-}) {
+}) => {
     const [open, setOpen] = useState(false);
     const rootRef = useRef<HTMLDivElement | null>(null);
     const pathname = usePathname();
     const { status } = useSession();
 
-    // Use server value as initial state, then correct on the client once session resolves.
     const isAuthedEffective = status === "loading" ? isAuthed : status === "authenticated";
 
     useEffect(() => {
@@ -97,4 +96,5 @@ export default function HeaderAuthNav({
     );
 }
 
+export default HeaderAuthNav;
 

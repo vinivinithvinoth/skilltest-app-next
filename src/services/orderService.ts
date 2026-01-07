@@ -1,9 +1,33 @@
-export type Order = Record<string, unknown> & {
+export type Order = {
   id?: string;
-  total_amount?: number;
+  order_id?: string;
+  created_date?: string;
+  product_amount?: number | string;
+  product_image?: string;
+  product_mrp?: number | string;
+  product_price?: number | string;
+  quantity?: number;
+  total_amount?: number | string;
   payment_status?: string;
   status?: string;
-};
+  product_name?: string;
+  name?: string;
+  title?: string;
+  sku?: string;
+  code?: string;
+  product_code?: string;
+  image?: string;
+  image_url?: string;
+  thumbnail?: string;
+  thumbnail_url?: string;
+  created_at?: string | Date;
+  createdAt?: string | Date;
+  created?: string | Date;
+  created_on?: string | Date;
+  date?: string | Date;
+  total?: number | string;
+  amount?: number | string;
+} & Record<string, unknown>;
 
 export type UserOrdersResponse =
   | Order[]

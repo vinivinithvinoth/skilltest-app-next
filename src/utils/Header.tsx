@@ -12,7 +12,7 @@ export default async function Header() {
     return (
         <header className="sticky top-0 z-50 bg-[#191919]">
             <div className="mx-auto flex h-[70px] w-full max-w-[1440px] items-center justify-between px-[60px] py-[8px]">
-                <Link href="/home" className="inline-flex items-center">
+                <Link href="/products" className="inline-flex items-center">
                     <Image
                         src="/logo_sm.svg"
                         alt="Logo"

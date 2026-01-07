@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { useUserStore } from "@/lib/userStore";
 
-export default function ProfileCompleteClient() {
+const ProfileCompleteClient = () => {
   const router = useRouter();
   const userName = useUserStore((s) => s.userName);
 
@@ -36,5 +36,8 @@ export default function ProfileCompleteClient() {
     </div>
   );
 }
+
+export default ProfileCompleteClient;
+
 
 

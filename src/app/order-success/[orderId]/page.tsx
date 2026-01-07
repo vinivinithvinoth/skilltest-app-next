@@ -1,99 +1,113 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 
 import { usePurchaseStore } from "@/lib/purchaseStore";
+import { formatINR, formatTimestamp } from "@/helpers/formate";
 
-function formatINR(value: string | number) {
-    const n = typeof value === "number" ? value : Number(value);
-    if (!Number.isFinite(n)) return String(value);
-    return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(n);
-}
+const OrderSuccessByIdPage = () => {
+    const { orderId: rawOrderId } = useParams<{ orderId?: string }>();
+    const orderId = rawOrderId ? decodeURIComponent(rawOrderId) : "";
 
-function formatTimestamp(d: Date) {
-    const time = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).format(d);
-    const day = d.getDate();
-    const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(d);
-    const year = new Intl.DateTimeFormat("en-US", { year: "numeric" }).format(d);
-    const suffix = (n: number) => {
-        const s = ["th", "st", "nd", "rd"];
-        const v = n % 100;
-        return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
-    };
-    return `${time}, ${suffix(day)} ${month} ${year}`;
-}
+    const record = usePurchaseStore((s) =>
+        orderId ? s.byOrderId[orderId] : undefined
+    );
 
-export default function OrderSuccessByIdPage() {
-    const params = useParams<{ orderId: string }>();
-    const orderId = params?.orderId ? decodeURIComponent(params.orderId) : "";
-
-    const record = usePurchaseStore((s) => (orderId ? s.byOrderId[orderId] : undefined));
     const lastOrderId = usePurchaseStore((s) => s.lastOrderId);
-    const fallback = usePurchaseStore((s) => (lastOrderId ? s.byOrderId[lastOrderId] : undefined));
+    const fallback = usePurchaseStore((s) =>
+        lastOrderId ? s.byOrderId[lastOrderId] : undefined
+    );
+
     const data = record ?? fallback;
+    console.log("Order Success Data:", data);
 
     const name = data?.productName ?? "Nike Shoes";
     const image = data?.productImage ?? "";
     const status = data?.status ?? "";
-    const total = typeof data?.amount === "number" ? data.amount : undefined;
-    const mrp = typeof data?.mrp === "number" ? data.mrp : undefined;
+    const displayOrderId = data?.orderId ?? orderId;
+
+    const rawAmount = data?.amount;
+    const total = typeof rawAmount === "string" ? parseFloat(rawAmount) : (typeof rawAmount === "number" ? rawAmount : undefined);
+
+    const rawMrp = data?.mrp;
+    const mrp = typeof rawMrp === "string" ? parseFloat(rawMrp) : (typeof rawMrp === "number" ? rawMrp : undefined);
 
     const timestamp =
         data?.createdLabel ??
-        (data?.createdAt ? formatTimestamp(new Date(data.createdAt)) : formatTimestamp(new Date()));
+        formatTimestamp(
+            data?.createdAt ? new Date(data.createdAt) : new Date()
+        );
 
     return (
         <div className="w-full bg-[#161616] px-6 py-8 font-sans text-white">
             <div className="mx-auto flex w-full max-w-[548px] flex-col items-center pb-10 text-center">
-                <img src="/logo_sm.svg" alt="Nike" className="h-10 w-10 opacity-95" />
+                <img
+                    src="/logo_sm.svg"
+                    alt="Nike"
+                    className="h-10 w-10 opacity-95"
+                />
 
-                <h1 className="mt-4 text-center text-2xl font-semibold tracking-tight">Successfully Ordered!</h1>
-                <p className="mt-2 text-center text-xs text-white/60">{timestamp}</p>
+                <h1 className="mt-4 text-2xl font-semibold tracking-tight">
+                    Successfully Ordered!
+                </h1>
 
-                <section className="mt-10 w-full rounded-lg bg-white/5 p-4 text-left backdrop-blur">
+                <p className="mt-2 text-xs text-white/60">{timestamp}</p>
+
+                <section className="mt-10 w-full rounded-lg bg-white/5 p-4 text-left backdrop-blur-md ring-1 ring-white/10">
                     <div className="flex items-center gap-4">
-                        <div className="relative h-14 w-20 overflow-hidden rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10">
+                        <div className="relative h-14 w-20 overflow-hidden rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10 flex items-center justify-center">
                             {image ? (
-                                <img src={image} alt={name} className="w-full object-contain p-2" />
+                                <img
+                                    src={image}
+                                    alt={name}
+                                    className="h-full w-full object-contain p-1"
+                                />
                             ) : (
-                                <img src="/logo_sm.svg" alt="" className="w-full object-contain p-4 opacity-80" />
+                                <img
+                                    src="/logo_sm.svg"
+                                    alt=""
+                                    className="w-10 h-10 object-contain opacity-80"
+                                />
                             )}
                         </div>
 
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold">{name}</p>
+
                             <p className="mt-0.5 truncate text-[11px] text-white/55">
-                                {orderId ? `Order ${orderId}` : "Order confirmed"}
+                                {displayOrderId ? `Order ${displayOrderId}` : "Order confirmed"}
                             </p>
-                            {status ? <p className="mt-0.5 text-[11px] text-white/55">Payment: {status}</p> : null}
+
+
+                            <p className="mt-0.5 text-[11px] text-white/45">
+                                Status: <span className="text-green-400/90">{status}</span>
+                            </p>
+
                         </div>
 
                         <div className="shrink-0 text-right">
-                            {typeof total === "number" ? <p className="text-sm font-semibold">{formatINR(total)}</p> : null}
-                            {typeof mrp === "number" ? (
-                                <p className="mt-0.5 text-[11px] text-white/45 line-through">{formatINR(mrp)}</p>
-                            ) : null}
+                            {total !== undefined && (
+                                <p className="text-sm font-semibold text-white">
+                                    {formatINR(total)}
+                                </p>
+                            )}
+
+                            {mrp !== undefined && (
+                                <p className="mt-0.5 text-[11px] text-white/40 line-through">
+                                    {formatINR(mrp).replace(/\.00$/, "")}
+                                </p>
+                            )}
                         </div>
                     </div>
                 </section>
 
-                {!data ? (
-                    <div className="mt-6 text-center text-sm text-white/60">
+                {!data && (
+                    <div className="mt-6 text-sm text-white/60">
                         <p>No recent purchase found in this browser.</p>
-                        <div className="mt-3 flex justify-center gap-4">
-                            <Link className="underline underline-offset-4 hover:text-white" href="/products">
-                                Back to Products
-                            </Link>
-                            <Link className="underline underline-offset-4 hover:text-white" href="/my-orders">
-                                View My Orders
-                            </Link>
-                        </div>
                     </div>
-                ) : null}
+                )}
             </div>
         </div>
     );
 }
-
-
+export default OrderSuccessByIdPage;

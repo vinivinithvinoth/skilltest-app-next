@@ -68,17 +68,14 @@ export default function ProductCard({ product, index }: { product: Product; inde
     const [size, setSize] = useState<number>(7);
     const [color, setColor] = useState<string>("#B6F400");
 
-    // Static demo options (API doesn't provide sizes/colors yet).
     const sizes = [7, 8, 9, 10];
     const colors = ["#B6F400", "#7A0AA6", "#A33035"];
 
     useEffect(() => {
-        // Start hidden; reveal on hover.
         gsap.set([sizeRowRef.current, colorRowRef.current, buyRef.current], {
             autoAlpha: 0,
             y: 10,
         });
-        // Gradient overlay becomes stronger on hover (GSAP-controlled).
         gsap.set(overlayRef.current, { autoAlpha: 0.5 });
     }, []);
 

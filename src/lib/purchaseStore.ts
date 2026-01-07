@@ -3,15 +3,13 @@ import { persist } from "zustand/middleware";
 
 export type PurchaseRecord = {
   orderId: string;
-  productId?: string; // product_id or variation_product_id (optional)
+  productId?: string; 
   status?: string;
   amount?: number;
   mrp?: number;
   productName?: string;
   productImage?: string;
-  // Prefer server-provided formatted label if available (e.g. "02:03 AM, 07 Jan 2026")
   createdLabel?: string;
-  // Otherwise ISO string
   createdAt?: string;
 };
 

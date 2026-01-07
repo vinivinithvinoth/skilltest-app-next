@@ -15,7 +15,7 @@ type RegisterFormValues = {
     phone_number: string;
 };
 
-export default function RegisterForm({ phone }: { phone: string }) {
+const RegisterForm = ({ phone }: { phone: string }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -36,11 +36,47 @@ export default function RegisterForm({ phone }: { phone: string }) {
         mode: "onSubmit",
         reValidateMode: "onChange",
     });
-
     useEffect(() => {
-        // Don't validate immediately; only show errors after submit.
         setValue("phone_number", effectivePhone, { shouldValidate: false });
     }, [effectivePhone, setValue]);
+
+    const onSubmit = async (values: RegisterFormValues) => {
+
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await loginRegister({
+                name: values?.name.trim(),
+                phone_number: values?.phone_number,
+            });
+
+            setUserName(res?.name ?? values?.name.trim());
+
+            const signInRes = await signIn("token", {
+                phone: res?.phone_number,
+                accessToken: res?.token?.access,
+                userId: res?.user_id,
+                name: res?.name,
+                redirect: false,
+                callbackUrl: "/profile-complete",
+            });
+
+            if (!signInRes || signInRes?.error) {
+                setError("Registered, but failed to create session. Please login again.");
+                return;
+            }
+
+            resetFlow();
+            router.push(signInRes?.url ?? "/profile-complete");
+        } catch {
+            setError("Registration failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+
+
 
     return (
         <div className="h-full min-h-0 w-full font-sans">
@@ -65,39 +101,7 @@ export default function RegisterForm({ phone }: { phone: string }) {
 
                         <form
                             className="mt-10 grid gap-3"
-                            onSubmit={handleSubmit(async (values) => {
-                                setLoading(true);
-                                setError(null);
-                                try {
-                                    const res = await loginRegister({
-                                        name: values.name.trim(),
-                                        phone_number: values.phone_number,
-                                    });
-
-                                    setUserName(res.name ?? values.name.trim());
-
-                                    const signInRes = await signIn("token", {
-                                        phone: res.phone_number,
-                                        accessToken: res.token.access,
-                                        userId: res.user_id,
-                                        name: res.name,
-                                        redirect: false,
-                                        callbackUrl: "/profile-complete",
-                                    });
-
-                                    if (!signInRes || signInRes.error) {
-                                        setError("Registered, but failed to create session. Please login again.");
-                                        return;
-                                    }
-
-                                    resetFlow();
-                                    router.push(signInRes.url ?? "/profile-complete");
-                                } catch {
-                                    setError("Registration failed. Please try again.");
-                                } finally {
-                                    setLoading(false);
-                                }
-                            })}
+                            onSubmit={handleSubmit(onSubmit)}
                         >
                             <label className="text-xs text-white/70">Phone</label>
                             <input
@@ -148,5 +152,4 @@ export default function RegisterForm({ phone }: { phone: string }) {
         </div>
     );
 }
-
-
+export default RegisterForm;

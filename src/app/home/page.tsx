@@ -32,7 +32,7 @@ export default function HomeLoginPage() {
 
     const phone = watch("phone");
 
-    async function requestOtp(values: LoginFormValues) {
+    const requestOtp = async (values: LoginFormValues) => {
         setLoading(true);
         setError(null);
         setDebugOtp(null);

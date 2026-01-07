@@ -24,14 +24,12 @@ export default function OtpForm({ phone }: { phone: string }) {
 
     const otpLength = useMemo(() => {
         const n = lastOtp ? lastOtp.length : 0;
-        // Screenshot shows 4 boxes, but backend OTP may be longer; adapt when we know.
         return Math.max(4, n);
     }, [lastOtp]);
 
     const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
     useEffect(() => {
-        // Ensure digits array matches current OTP length.
         setDigits((prev) => {
             const next = Array.from({ length: otpLength }, (_, i) => prev[i] ?? "");
             return next;
@@ -57,7 +55,7 @@ export default function OtpForm({ phone }: { phone: string }) {
     }
 
     function setDigitAt(i: number, value: string) {
-        const v = value.replace(/\D/g, "").slice(-1); // last digit only
+        const v = value.replace(/\D/g, "").slice(-1);
         setDigits((prev) => {
             const next = [...prev];
             next[i] = v;
